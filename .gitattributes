@@ -2,3 +2,5 @@
 *.ppm -text
 *.png -text
 *.blend -text
+*.npy -text
+*.gif -text

@@ -20,21 +20,8 @@ from transforms import perspective, look_at, rot_y, translate, scale
 from objio import load_obj
 from ppm_io import read_ppm, write_ppm
 from srgb import srgb_to_linear, linear_to_srgb
-
-
-# ------------------------------------------------------------ texture sampling
-def sample_bilinear(tex_lin, u, v):
-    """tex_lin: (H,W,3) float in linear light. u,v arrays in [0,1] (wrapped)."""
-    H, W = tex_lin.shape[:2]
-    u = np.mod(u, 1.0) * (W - 1)
-    v = np.mod(v, 1.0) * (H - 1)
-    x0 = np.floor(u).astype(int); y0 = np.floor(v).astype(int)
-    x1 = np.clip(x0 + 1, 0, W - 1); y1 = np.clip(y0 + 1, 0, H - 1)
-    fx = (u - x0)[..., None]; fy = (v - y0)[..., None]
-    x0 = np.clip(x0, 0, W - 1); y0 = np.clip(y0, 0, H - 1)
-    top = tex_lin[y0, x0] * (1 - fx) + tex_lin[y0, x1] * fx
-    bot = tex_lin[y1, x0] * (1 - fx) + tex_lin[y1, x1] * fx
-    return top * (1 - fy) + bot * fy
+from texture_sampling import (sample_bilinear, sample_nearest, sample_trilinear,
+                              build_mipmaps)
 
 
 # ---------------------------------------------------------------- near clipping
@@ -73,9 +60,21 @@ def clip_triangle_near(vc, attrs):
 def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
            eye=(2.6, 2.0, 3.4), center=(0, 0.7, 0), fovy=45.0,
            near=1.0, far=14.0, light_dir=(0.4, 0.9, 0.6), ambient=0.15,
-           cull_back=False, depth_bits=None):
+           cull_back=False, depth_bits=None, perspective_correct=True,
+           texture_filter='bilinear', mip_levels=None, stats=None):
     """depth_bits: if set, the stored depth is quantised to that many bits
     (a low-precision depth buffer) -- used to make z-fighting reproducible."""
+    if w <= 0 or h <= 0 or not 0 < near < far:
+        raise ValueError('positive framebuffer and 0 < near < far required')
+    if depth_bits is not None and not 1 <= depth_bits <= 32:
+        raise ValueError('depth_bits must be in [1,32]')
+    if texture_filter not in ('nearest','bilinear','trilinear'):
+        raise ValueError('unknown texture filter')
+    if stats is None:
+        stats = {}
+    stats.update(triangles_input=mesh.n_tris, triangles_after_near_clip=0,
+                 triangles_culled=0, covered_fragments=0, depth_passes=0,
+                 sampled_lod_sum=0.0, sampled_lod_max=0.0, texture_samples=0)
     if model is None:
         model = np.eye(4)
     eye_pos = np.asarray(eye, float)
@@ -91,6 +90,10 @@ def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
     tex_lin = None
     if tex_u8 is not None:
         tex_lin = srgb_to_linear(tex_u8.astype(np.float64) / 255.0)
+        if texture_filter == 'trilinear' and mip_levels is None:
+            mip_levels = build_mipmaps(tex_u8,4)
+    elif texture_filter == 'trilinear':
+        raise ValueError('trilinear filtering needs a texture')
 
     color = np.zeros((h, w, 3), np.float64)
     depth = np.full((h, w), np.inf)
@@ -115,6 +118,7 @@ def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
         # attrs to carry through clipping: [u, v, 1] (1 -> becomes 1/w below)
         attrs = np.c_[uv, np.ones(3)]
         for (cvc, cattr) in (clip_triangle_near(vc, attrs) or []):
+            stats['triangles_after_near_clip'] += 1
             wv = cvc[:, 3]
             ndc = cvc[:, :3] / wv[:, None]
             sx = (ndc[:, 0] * 0.5 + 0.5) * w
@@ -138,6 +142,7 @@ def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
             if area == 0:
                 continue
             if cull_back and area > 0:          # screen y-down: front faces have area<0
+                stats['triangles_culled'] += 1
                 continue
 
             ys, xs = np.mgrid[miny:maxy + 1, minx:maxx + 1]
@@ -150,24 +155,59 @@ def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
             inside = (lA >= 0) & (lB >= 0) & (lC >= 0)
             if not inside.any():
                 continue
+            stats['covered_fragments'] += int(inside.sum())
 
             l0, l1, l2 = lA, lB, lC          # vertex 0=A, 1=B, 2=C
             frag_z = l0 * sz[0] + l1 * sz[1] + l2 * sz[2]
+            # Near clipping already changed the polygon. The far plane can be
+            # rejected per fragment here because z_NDC is affine in screen space.
+            in_depth_range = (frag_z >= -1-1e-12) & (frag_z <= 1+1e-12)
             if depth_bits is not None:
-                q = float(2 ** depth_bits)
+                q = float(2 ** depth_bits - 1)
                 frag_z = np.round((frag_z * 0.5 + 0.5) * q) / q * 2.0 - 1.0
             inv_w_i = l0 * inv_w[0] + l1 * inv_w[1] + l2 * inv_w[2]
 
             reg = depth[miny:maxy + 1, minx:maxx + 1]
-            win = inside & (frag_z < reg)
+            win = inside & in_depth_range & (frag_z < reg)
             if not win.any():
                 continue
             reg[win] = frag_z[win]
 
             if tex_lin is not None:
-                u_i = (l0 * uvw[0, 0] + l1 * uvw[1, 0] + l2 * uvw[2, 0]) / inv_w_i
-                v_i = (l0 * uvw[0, 1] + l1 * uvw[1, 1] + l2 * uvw[2, 1]) / inv_w_i
-                tex_rgb = sample_bilinear(tex_lin, u_i, v_i)     # (H,W,3) linear
+                safe_inv_w = np.where(np.abs(inv_w_i) > 1e-15, inv_w_i, 1.0)
+                if perspective_correct:
+                    u_i = (l0 * uvw[0, 0] + l1 * uvw[1, 0] + l2 * uvw[2, 0]) / safe_inv_w
+                    v_i = (l0 * uvw[0, 1] + l1 * uvw[1, 1] + l2 * uvw[2, 1]) / safe_inv_w
+                else:
+                    u_i = l0*cattr[0,0] + l1*cattr[1,0] + l2*cattr[2,0]
+                    v_i = l0*cattr[0,1] + l1*cattr[1,1] + l2*cattr[2,1]
+                if texture_filter == 'trilinear':
+                    # Quotient rule for rational UV interpolation. Each lambda
+                    # derivative is constant across this projected triangle.
+                    dx = np.array([-(cy-by),-(ay-cy),-(by-ay)])/area
+                    dy = np.array([(cx-bx),(ax-cx),(bx-ax)])/area
+                    if perspective_correct:
+                        rx,ry = dx@inv_w,dy@inv_w
+                        ux = (dx@uvw[:,0]-u_i*rx)/safe_inv_w
+                        vx = (dx@uvw[:,1]-v_i*rx)/safe_inv_w
+                        uy = (dy@uvw[:,0]-u_i*ry)/safe_inv_w
+                        vy = (dy@uvw[:,1]-v_i*ry)/safe_inv_w
+                    else:
+                        ux,vx=dx@cattr[:,0],dx@cattr[:,1]
+                        uy,vy=dy@cattr[:,0],dy@cattr[:,1]
+                    th,tw = tex_lin.shape[:2]
+                    rho = np.maximum(np.hypot(ux*(tw-1),vx*(th-1)),
+                                     np.hypot(uy*(tw-1),vy*(th-1)))
+                    lod = np.broadcast_to(np.log2(np.maximum(rho,1.0)),u_i.shape)
+                    used_lod = np.clip(lod,0,len(mip_levels)-1)
+                    tex_rgb = sample_trilinear(mip_levels,u_i,v_i,lod)
+                    stats['sampled_lod_sum'] += float(used_lod[win].sum())
+                    stats['sampled_lod_max'] = max(stats['sampled_lod_max'],float(used_lod[win].max()))
+                elif texture_filter == 'nearest':
+                    tex_rgb = sample_nearest(tex_lin,u_i,v_i)
+                else:
+                    tex_rgb = sample_bilinear(tex_lin,u_i,v_i)
+                stats['texture_samples'] += int(win.sum())
             elif tri_colors is not None:
                 tex_rgb = np.ones((*lA.shape, 3)) * srgb_to_linear(
                     np.asarray(tri_colors[fi], float) / 255.0)
@@ -179,6 +219,7 @@ def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
             cregion[win] = linear_to_srgb(lit)[win]
             filled += int(win.sum())
 
+    stats['depth_passes'] = filled
     return (np.clip(color * 255, 0, 255).astype(np.uint8), depth, filled)
 
 
@@ -228,9 +269,16 @@ def _demo_overlap(w, h):
     mb = Mesh(np.array(back), np.zeros((0, 2)), [[0, 1, 2]], [])
     _, depb, fb = render(mb, w=w, h=h, near=1.0, far=50.0, eye=(0, 0, 0),
                          center=(0, 0, -1), cull_back=False, light_dir=(0, 0, 1))
-    print("front triangle depth ~0.30, back triangle depth ~0.70")
-    print("pixels where BACK won the z-test: 0    (front fully occludes the overlap)")
-    print(f"pixels where BACK is visible (no overlap): {fb}")
+    mf = Mesh(np.array(front), np.zeros((0,2)), [[0,1,2]], [])
+    _,depf,_ = render(mf,w=w,h=h,near=1,far=50,eye=(0,0,0),
+                      center=(0,0,-1),light_dir=(0,0,1))
+    overlap = np.isfinite(depf) & np.isfinite(depb)
+    back_wins = int(np.sum(overlap & (dep >= depb-1e-12)))
+    back_visible = int(np.sum(np.isfinite(depb) & ~np.isfinite(depf)))
+    print(f'front depth NDC={np.median(depf[np.isfinite(depf)]):.3f}; '
+          f'back depth NDC={np.median(depb[np.isfinite(depb)]):.3f}')
+    print(f'pixels where BACK won in overlap: {back_wins}/{int(overlap.sum())}')
+    print(f'pixels where BACK is visible (no overlap): {back_visible}')
     os.makedirs("out", exist_ok=True)
     write_ppm("out/overlap.ppm", col)
     print("wrote out/overlap.ppm")
@@ -252,6 +300,10 @@ def main():
     ap.add_argument("--w", type=int, default=512)
     ap.add_argument("--h", type=int, default=512)
     ap.add_argument("--out", default="out/temple_raster.ppm")
+    ap.add_argument('--texture', default='data/relief.ppm')
+    ap.add_argument('--mipmaps', action='store_true')
+    ap.add_argument('--naive-uv', action='store_true')
+    ap.add_argument('--cull-back', action='store_true')
     ap.add_argument("--demo-triangle", action="store_true")
     ap.add_argument("--demo-overlap", action="store_true")
     args = ap.parse_args()
@@ -264,19 +316,25 @@ def main():
     if not args.model:
         raise SystemExit("give --model, or --demo-triangle / --demo-overlap")
     mesh = load_obj(args.model)
-    tex = read_ppm("data/relief.ppm") if os.path.exists("data/relief.ppm") else None
+    tex = read_ppm(args.texture) if os.path.exists(args.texture) else None
     model = translate((0, 0, 0)) @ rot_y(35) @ scale((1.4, 1.4, 1.4))
-    col, dep, filled = render(mesh, w=args.w, h=args.h, tex_u8=tex, model=model)
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    col, dep, filled = render(mesh, w=args.w, h=args.h, tex_u8=tex, model=model,
+                              texture_filter='trilinear' if args.mipmaps else 'bilinear',
+                              perspective_correct=not args.naive_uv,cull_back=args.cull_back)
+    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     write_ppm(args.out, col)
     fin = np.isfinite(dep)
     dvis = np.where(fin, (dep + 1) * 0.5, 1.0)
-    write_ppm(args.out.replace("raster", "depth"),
+    parent,filename = os.path.split(args.out)
+    depth_name = (filename.replace('raster','depth') if 'raster' in filename
+                  else os.path.splitext(filename)[0]+'_depth.ppm')
+    depth_path = os.path.join(parent,depth_name)
+    write_ppm(depth_path,
               np.repeat((np.clip(dvis, 0, 1) * 255).astype(np.uint8)[..., None], 3, axis=2))
     print(f"model: {mesh.n_tris} triangles   framebuffer {args.w}x{args.h}")
     print(f"filled fragments: {filled}   depth(ndc) range "
           f"[{dep[fin].min():.3f}, {dep[fin].max():.3f}]" if fin.any() else "nothing drawn")
-    print(f"wrote {args.out} and {args.out.replace('raster','depth')}")
+    print(f"wrote {args.out} and {depth_path}")
 
 
 if __name__ == "__main__":

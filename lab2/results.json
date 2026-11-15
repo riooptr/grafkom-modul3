@@ -1,0 +1,344 @@
+{
+  "recorded_at": "2026-11-15T15:29:39+07:00",
+  "assistance": "Codex-assisted extensions of the supplied NumPy starter",
+  "ssim_definition": "single global window over RGB values; not sliding-window SSIM",
+  "pipeline_dependencies": [
+    "Python standard library",
+    "NumPy"
+  ],
+  "report_dependencies": {
+    "Pillow": "image serialization only",
+    "Matplotlib": "3.11.2"
+  },
+  "fallback_vs_frozen_reference": {
+    "psnr_db": "inf",
+    "ssim_global": 1.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0,
+    "different_pixels": 0
+  },
+  "frozen_reference_sha256": "6ec947c0de042ad847326c626e0fd1e5908394ea27afc2fe9d8ec6732c91bf2e",
+  "fallback_raster_vs_ray": {
+    "psnr_db": "inf",
+    "ssim_global": 1.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0,
+    "different_pixels": 0
+  },
+  "own_model_raster_vs_ray": {
+    "psnr_db": 64.16574106754942,
+    "ssim_global": 0.9999881909998636,
+    "mean_absolute_error": 0.0005442301432291666,
+    "max_absolute_error": 68,
+    "different_pixels": 3
+  },
+  "own_model_residuals": [
+    {
+      "pixel_xy": [
+        105,
+        177
+      ],
+      "nearest_projected_triangle_edge_distance_pixels": 0.17168101329233335,
+      "rgb_raster": [
+        153,
+        70,
+        39
+      ],
+      "rgb_ray": [
+        85,
+        58,
+        41
+      ]
+    },
+    {
+      "pixel_xy": [
+        108,
+        178
+      ],
+      "nearest_projected_triangle_edge_distance_pixels": 0.1597678691942109,
+      "rgb_raster": [
+        155,
+        72,
+        41
+      ],
+      "rgb_ray": [
+        149,
+        66,
+        35
+      ]
+    },
+    {
+      "pixel_xy": [
+        112,
+        179
+      ],
+      "nearest_projected_triangle_edge_distance_pixels": 0.05784110767586535,
+      "rgb_raster": [
+        150,
+        67,
+        36
+      ],
+      "rgb_ray": [
+        147,
+        68,
+        39
+      ]
+    }
+  ],
+  "own_model_resolution": [
+    256,
+    256
+  ],
+  "own_model_render_seconds_single_run": {
+    "raster": 0.3970738000007259,
+    "ray": 5.958000399999946
+  },
+  "bugs": {
+    "inside-out": {
+      "before": {
+        "psnr_db": 14.32962115498908,
+        "ssim_global": 0.7896850965561829,
+        "mean_absolute_error": 28.536304615162038,
+        "max_absolute_error": 196,
+        "different_pixels": 18974
+      },
+      "after": {
+        "psnr_db": "inf",
+        "ssim_global": 1.0,
+        "mean_absolute_error": 0.0,
+        "max_absolute_error": 0,
+        "different_pixels": 0
+      },
+      "cause": "all face and UV corner indices reversed",
+      "fix": "reverse BOTH geometry and UV corner order once",
+      "model_matrix": [
+        [
+          1.1468128620045885,
+          0.0,
+          0.8030070108914644,
+          0.0
+        ],
+        [
+          0.0,
+          1.4,
+          0.0,
+          0.0
+        ],
+        [
+          -0.8030070108914644,
+          0.0,
+          1.1468128620045885,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "cull_back": true
+    },
+    "zfight": {
+      "before": {
+        "psnr_db": 16.43932165558268,
+        "ssim_global": 0.7628785537180004,
+        "mean_absolute_error": 9.000180844907407,
+        "max_absolute_error": 169,
+        "different_pixels": 2852
+      },
+      "after": {
+        "psnr_db": 28.342638637285592,
+        "ssim_global": 0.9841509628423354,
+        "mean_absolute_error": 0.5806568287037037,
+        "max_absolute_error": 169,
+        "different_pixels": 184
+      },
+      "cause": "depth quantization ties with near=0.001 at far=200",
+      "fix": "near=1.0; keep far=200 and depth_bits=16",
+      "depth_bits": 16,
+      "far": 200,
+      "bad_near": 0.001,
+      "fixed_near": 1.0,
+      "wrong_pixels_before": 2852,
+      "wrong_pixels_after": 184,
+      "histogram_summary": {
+        "bad": {
+          "unique_visible_codes": 1,
+          "depth01_min": 0.9999389639124132,
+          "depth01_max": 0.9999389639124132
+        },
+        "fixed": {
+          "unique_visible_codes": 13,
+          "depth01_min": 0.9378347447928588,
+          "depth01_max": 0.9380178530556191
+        }
+      }
+    },
+    "stretched": {
+      "before": {
+        "psnr_db": 13.415402255283801,
+        "ssim_global": 0.7066051878050976,
+        "mean_absolute_error": 27.79496708622685,
+        "max_absolute_error": 230,
+        "different_pixels": 15405
+      },
+      "after": {
+        "psnr_db": "inf",
+        "ssim_global": 1.0,
+        "mean_absolute_error": 0.0,
+        "max_absolute_error": 0,
+        "different_pixels": 0
+      },
+      "cause": "T@S@R instead of T@R@S with the same factors",
+      "fix": "swap only R and S",
+      "bad_matrix": [
+        [
+          1.392558475291286,
+          0.0,
+          0.9750799417967783,
+          0.15
+        ],
+        [
+          0.0,
+          1.1,
+          0.0,
+          0.0
+        ],
+        [
+          -0.5162187927159415,
+          0.0,
+          0.7372368398600926,
+          -0.1
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "fixed_matrix": [
+        [
+          1.392558475291286,
+          0.0,
+          0.5162187927159415,
+          0.15
+        ],
+        [
+          0.0,
+          1.1,
+          0.0,
+          0.0
+        ],
+        [
+          -0.9750799417967783,
+          0.0,
+          0.7372368398600926,
+          -0.1
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "perspective_uv": {
+    "w_left": 1,
+    "w_right": 9,
+    "u_naive": 0.5,
+    "u_correct": 0.09999999999999999,
+    "naive_vs_ray": {
+      "psnr_db": 10.904529999275393,
+      "ssim_global": 0.5974813366965791,
+      "mean_absolute_error": 25.8480224609375,
+      "max_absolute_error": 220,
+      "different_pixels": 9360
+    },
+    "correct_vs_ray": {
+      "psnr_db": 84.53469032435927,
+      "ssim_global": 0.999999982460259,
+      "mean_absolute_error": 0.0002288818359375,
+      "max_absolute_error": 1,
+      "different_pixels": 15
+    }
+  },
+  "mipmap": {
+    "linear_level_sizes": [
+      [
+        256,
+        256
+      ],
+      [
+        128,
+        128
+      ],
+      [
+        64,
+        64
+      ],
+      [
+        32,
+        32
+      ]
+    ],
+    "interior_pixels": 1074,
+    "hf_energy_before": 0.008216306008930472,
+    "hf_energy_after": 0.004509795871387352,
+    "hf_reduction_percent": 45.11163695113641,
+    "mae_to_ssaa4_before": 6.870577281191807,
+    "mae_to_ssaa4_after": 4.350713842333954,
+    "mean_adjacent_frame_mae_before": 6.67150735948367,
+    "mean_adjacent_frame_mae_after": 2.699241223433816,
+    "mean_lod": 3.0,
+    "max_lod": 3.0,
+    "lod_cap_reached": true
+  },
+  "culling": {
+    "before": {
+      "triangles_input": 636,
+      "triangles_after_near_clip": 636,
+      "triangles_culled": 0,
+      "covered_fragments": 59640,
+      "depth_passes": 33822,
+      "sampled_lod_sum": 0.0,
+      "sampled_lod_max": 0.0,
+      "texture_samples": 33822
+    },
+    "after": {
+      "triangles_input": 636,
+      "triangles_after_near_clip": 636,
+      "triangles_culled": 318,
+      "covered_fragments": 29820,
+      "depth_passes": 26558,
+      "sampled_lod_sum": 0.0,
+      "sampled_lod_max": 0.0,
+      "texture_samples": 26558
+    },
+    "image_comparison": {
+      "psnr_db": "inf",
+      "ssim_global": 1.0,
+      "mean_absolute_error": 0.0,
+      "max_absolute_error": 0,
+      "different_pixels": 0
+    },
+    "covered_fragment_reduction_percent": 50.0
+  },
+  "summary_checks": {
+    "fallback_matches_frozen_reference": true,
+    "fallback_matches_independent_rays": true,
+    "own_model_matches_independent_rays": true,
+    "three_bug_ssim_scores_improve": true,
+    "zfight_wrong_pixel_count_reduced": true,
+    "e4_midpoint_correct": true,
+    "perspective_uv_agrees_with_ray": true,
+    "four_linear_light_mip_levels": true,
+    "mip_high_frequency_energy_reduced": true,
+    "mip_closer_to_ssaa4": true,
+    "culling_reduces_fragments_without_rgb_change": true
+  },
+  "regression_tests": "14/14 passed; none skipped"
+}

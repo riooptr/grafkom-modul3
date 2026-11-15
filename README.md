@@ -1,5 +1,41 @@
 # Module 3 -- 3D Transforms, Projection, Texture & Real-Time (reference repo)
 
+## Lab 2 - hasil pengerjaan lokal (15 November 2026)
+
+Kelima butir teknis Lab 2 sudah dijalankan: pipeline MVP dan clipping, pembandingan
+raster/ray, tiga diagnosis, UV perspective-correct, mipmap empat tingkat, serta
+penghematan fragment dengan backface culling.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r lab2/requirements-report.txt
+.\.venv\Scripts\python.exe tests.py
+.\.venv\Scripts\python.exe run_lab2.py
+.\.venv\Scripts\python.exe broken_scene.py --all
+```
+
+- [Laporan Lab 2](lab2/Laporan_Lab2.md), [angka dan parameter lengkap](lab2/results.json),
+  [transkrip 14/14 pengujian](lab2/tests.txt), serta [diagnosis sebelum perubahan](lab2/diagnosis_before_changes.md).
+- Model 636 segitiga pada 256x256: raster/ray **PSNR 64.166 dB**, SSIM global
+  **0.999988**, berbeda pada **3 pixel**; koordinat dan RGB residual dicatat.
+- Fallback 160x160 tetap identik dengan referensi lokal yang dibekukan; ray caster
+  juga identik pada konfigurasi ini. Referensi tidak dibuat ulang oleh tests.py.
+- Z-fighting: pixel salah **2852 -> 184**; SSIM terhadap oracle float
+  **0.762879 -> 0.984151**. Histogram dan data depth numerik tersedia.
+- Mipmap 256/128/64/32, box filter di linear light dan LOD analitik: energi
+  frekuensi tinggi interior turun **45.11%**, MAE ke SSAA4 turun **6.871 -> 4.351**.
+- Culling: candidate fragments **59640 -> 29820** (**50%**), RGB identik.
+- Verified: **14/14 regression checks**, tanpa skip, dan **11 pemeriksaan bukti** lulus.
+- Matplotlib **3.11.2** dipakai untuk plot laporan saja; rendering tetap hanya NumPy.
+  Environment lengkap terkunci di `lab2/requirements.lock.txt`.
+
+Perbaikan kode mencakup near/far pada ray caster, kuantisasi integer yang tepat,
+metrik fragment, opsi UV naif, sampler nearest/bilinear/trilinear, dan histogram
+depth. Eksperimen stretched memakai faktor nonuniform yang sama dalam urutan
+berbeda; diagnosis inside-out mengoreksi label winding starter pada salinan mesh.
+Hasil audit starter dan keterbatasan oracle dicatat dalam laporan, termasuk bantuan
+Codex. Publikasi serta verifikasi viewer browser adalah pekerjaan Lab 3.
+
 ## Lab 1 - hasil pengerjaan lokal (15 November 2026)
 
 Dependensi telah dipasang dalam `.venv` lokal menggunakan
@@ -37,6 +73,12 @@ bukan rekonstruksi arkeologis terukur. Bagian di bawah adalah README starter dan
 catatan verifikasi penulis starter, bukan bukti bahwa Lab 2/3 telah dikerjakan.
 
 ---
+
+## Catatan starter asli (arsip)
+
+Bagian berikut mempertahankan dokumentasi dan angka verifikasi penulis starter.
+Beberapa perilaku telah diperbaiki di Lab 2; gunakan perintah dan hasil terbaru
+di bagian atas untuk pengerjaan sekarang.
 
 Course: *Grafika Komputer / Computer Graphics* (`25MP7716G030`), S1 Informatika
 semester 5. Companion to `../../Module3_EN.tex`. **Feeds the UTS directly.**

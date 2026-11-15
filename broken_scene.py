@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import json
 
 import numpy as np
 
@@ -38,6 +39,7 @@ def bug_inside_out(mesh, tex, w=192, h=192):
     # -> the outward faces are now "back-facing" and get culled; you see through
     # the temple to its far interior. FIX: re-wind the faces (or, if you cannot
     # touch the mesh, disable culling).
+    mesh = outward_fallback(mesh)
     flipped = Mesh(mesh.positions, mesh.uvs,
                    mesh.faces[:, ::-1].copy(),
                    None if mesh.face_uvs is None else mesh.face_uvs[:, ::-1].copy())
@@ -91,31 +93,100 @@ def bug_zfight(mesh, tex, w=192, h=192):
 
 
 def bug_stretched(mesh, tex, w=192, h=192):
-    # WRONG: apply scale AFTER rotate-in-world by writing the product backwards
-    wrong_model = scale((1.4, 1.4, 1.4)) @ rot_y(35) @ translate((0, 0, 0))
-    wrong_model = wrong_model @ np.diag([2.2, 0.5, 1.0, 1.0])  # non-uniform, wrong place
+    # Both products use EXACTLY the same nonuniform scale and rotation factors.
+    # The original starter instead appended an extra scale to commuting factors.
+    T,R,S = translate((.15,0,-.1)),rot_y(35),scale((1.7,1.1,.9))
+    wrong_model = T @ S @ R
+    correct_model = T @ R @ S
     bad, _, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=wrong_model)
-    good, _, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=GOOD_MODEL)
+    good, _, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=correct_model)
     ev = ("model matrix rows (bad):\n" + np.array2string(wrong_model[:3], precision=2) +
-          "\nvs good:\n" + np.array2string(GOOD_MODEL[:3], precision=2))
+          "\nvs good (same factors, T@R@S):\n" + np.array2string(correct_model[:3], precision=2))
     return bad, good, ev
 
 
 BUGS = {"inside-out": bug_inside_out, "zfight": bug_zfight, "stretched": bug_stretched}
 
 
+def outward_fallback(mesh):
+    """Correct only the KNOWN 15 closed boxes of make_model.py, not arbitrary OBJ.
+
+    Its original faces are inward despite the generator's outward-CCW comment.
+    Keep historical input/ref files intact and orient a diagnostic copy instead.
+    """
+    if len(mesh.positions) != 120 or mesh.n_tris != 180:
+        raise ValueError('outward_fallback expects the documented 15-box starter')
+    faces,uvs=mesh.faces.copy(),mesh.face_uvs.copy()
+    for first in range(0,len(faces),12):
+        t=mesh.positions[faces[first:first+12]]
+        volume=np.einsum('ij,ij->i',t[:,0],np.cross(t[:,1],t[:,2])).sum()/6
+        if volume < 0:
+            faces[first:first+12]=faces[first:first+12,::-1]
+            uvs[first:first+12]=uvs[first:first+12,::-1]
+    return Mesh(mesh.positions,mesh.uvs,faces,uvs)
+
+
+def diagnostic_renders(name,mesh,tex,w=192,h=192):
+    """Bad/fixed/reference RGB and true depth images for the Lab 2 evidence.
+
+    Inside-out and matrix-order references are controlled intended configurations.
+    Z-fighting references use full float precision, not the quantized fixed frame.
+    """
+    if name == 'inside-out':
+        canonical=outward_fallback(mesh)
+        flipped=Mesh(canonical.positions,canonical.uvs,canonical.faces[:,::-1].copy(),
+                     canonical.face_uvs[:,::-1].copy())
+        fixed=Mesh(flipped.positions,flipped.uvs,flipped.faces[:,::-1].copy(),
+                   flipped.face_uvs[:,::-1].copy())
+        kw=dict(w=w,h=h,tex_u8=tex,model=GOOD_MODEL,cull_back=True)
+        a,da,_=raster3d.render(flipped,**kw)
+        b,db,_=raster3d.render(fixed,**kw)
+        ref,dr,_=raster3d.render(canonical,**kw)
+        meta={'cause':'all face and UV corner indices reversed',
+              'fix':'reverse BOTH geometry and UV corner order once',
+              'model_matrix':GOOD_MODEL.tolist(),'cull_back':True}
+    elif name == 'stretched':
+        T,R,S=translate((.15,0,-.1)),rot_y(35),scale((1.7,1.1,.9))
+        bad_M,good_M=T@S@R,T@R@S
+        kw=dict(w=w,h=h,tex_u8=tex)
+        a,da,_=raster3d.render(mesh,model=bad_M,**kw)
+        b,db,_=raster3d.render(mesh,model=good_M,**kw)
+        ref,dr,_=raster3d.render(mesh,model=good_M,**kw)
+        meta={'cause':'T@S@R instead of T@R@S with the same factors',
+              'fix':'swap only R and S',
+              'bad_matrix':bad_M.tolist(),'fixed_matrix':good_M.tolist()}
+    elif name == 'zfight':
+        m=_zfight_scene()
+        kw=dict(w=w,h=h,eye=(0,1,6),center=(0,1,-1),cull_back=False,
+                far=200,tri_colors=TRI_COLS,light_dir=(0,.2,1))
+        a,da,_=raster3d.render(m,near=.001,depth_bits=16,**kw)
+        b,db,_=raster3d.render(m,near=1,depth_bits=16,**kw)
+        ref,dr,_=raster3d.render(m,near=1,depth_bits=None,**kw)
+        ref_bad,_,_=raster3d.render(m,near=.001,depth_bits=None,**kw)
+        assert np.array_equal(ref,ref_bad), 'Near change altered geometry visibility'
+        meta={'cause':'depth quantization ties with near=0.001 at far=200',
+              'fix':'near=1.0; keep far=200 and depth_bits=16',
+              'depth_bits':16,'far':200,'bad_near':.001,'fixed_near':1.0,
+              'wrong_pixels_before':int((np.abs(a.astype(int)-ref.astype(int)).max(2)>60).sum()),
+              'wrong_pixels_after':int((np.abs(b.astype(int)-ref.astype(int)).max(2)>60).sum())}
+    else:
+        raise ValueError(name)
+    return {'bad':a,'fixed':b,'reference':ref,'bad_depth':da,'fixed_depth':db,
+            'reference_depth':dr,'metadata':meta}
+
+
 def run(name, mesh, tex):
-    bad, good, evidence = BUGS[name](mesh, tex)
+    diagnostic = diagnostic_renders(name,mesh,tex)
+    bad,good,reference=diagnostic['bad'],diagnostic['fixed'],diagnostic['reference']
     os.makedirs("out", exist_ok=True)
     write_ppm(f"out/bug_{name}_bad.ppm", bad)
     write_ppm(f"out/bug_{name}_fixed.ppm", good)
-    s = ssim(bad, good)
-    p = psnr(bad, good)
+    write_ppm(f'out/bug_{name}_reference.ppm',reference)
     print(f"\n== bug: {name} ==")
-    print("evidence:", evidence)
-    print(f"SSIM(bad, fixed) = {s:.3f}   PSNR = {'inf' if np.isinf(p) else f'{p:.1f}'} dB "
-          f"  -> {'large visible difference' if s < 0.9 else 'subtle'}")
-    print(f"wrote out/bug_{name}_bad.ppm, out/bug_{name}_fixed.ppm")
+    print('evidence:',json.dumps(diagnostic['metadata'],indent=2))
+    print(f'SSIM(bad, reference) = {ssim(bad,reference):.6f}')
+    print(f'SSIM(fixed, reference) = {ssim(good,reference):.6f}')
+    print(f'wrote out/bug_{name}_bad.ppm, out/bug_{name}_fixed.ppm, out/bug_{name}_reference.ppm')
 
 
 def main():

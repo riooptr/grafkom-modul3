@@ -18,7 +18,7 @@ from transforms import look_at, rot_y, scale, translate
 from objio import load_obj
 from ppm_io import read_ppm, write_ppm
 from srgb import srgb_to_linear, linear_to_srgb
-from raster3d import sample_bilinear
+from texture_sampling import sample_bilinear
 
 
 def moller_trumbore(orig, dirs, v0, v1, v2):
@@ -41,7 +41,9 @@ def moller_trumbore(orig, dirs, v0, v1, v2):
 
 def render(mesh, *, w, h, tex_u8=None, model=None,
            eye=(2.6, 2.0, 3.4), center=(0, 0.7, 0), fovy=45.0,
-           light_dir=(0.4, 0.9, 0.6), ambient=0.15):
+           light_dir=(0.4, 0.9, 0.6), ambient=0.15, near=1.0, far=14.0):
+    if w <= 0 or h <= 0 or not 0 < near < far:
+        raise ValueError('positive framebuffer and 0 < near < far required')
     if model is None:
         model = np.eye(4)
     pos_h = np.c_[mesh.positions, np.ones(len(mesh.positions))]
@@ -64,6 +66,7 @@ def render(mesh, *, w, h, tex_u8=None, model=None,
             fwd)
     dirs /= np.linalg.norm(dirs, axis=-1, keepdims=True)
     D = dirs.reshape(-1, 3)
+    ray_forward = D @ fwd
 
     best_t = np.full(len(D), np.inf)
     best_f = np.full(len(D), -1, np.int64)
@@ -71,7 +74,9 @@ def render(mesh, *, w, h, tex_u8=None, model=None,
     for fi in range(len(tris)):
         v0, v1, v2 = tris[fi]
         t, bu, bv = moller_trumbore(eye, D, v0, v1, v2)
-        closer = t < best_t
+        # near/far are distances along the camera axis, not radial ray t.
+        eye_distance = t * ray_forward
+        closer = (t < best_t) & (eye_distance >= near) & (eye_distance <= far)
         if closer.any():
             best_t[closer] = t[closer]
             best_f[closer] = fi
@@ -87,7 +92,11 @@ def render(mesh, *, w, h, tex_u8=None, model=None,
             continue
         m = best_f == fi
         v0, v1, v2 = tris[fi]
-        n = np.cross(v1 - v0, v2 - v0); n /= np.linalg.norm(n) + 1e-12
+        n = np.cross(v1 - v0, v2 - v0)
+        length = np.linalg.norm(n)
+        if length < 1e-12:
+            continue
+        n /= length
         # orient toward the camera (same rule as raster3d), then one-sided Lambert
         if n @ (eye - (v0 + v1 + v2) / 3.0) < 0:
             n = -n
@@ -107,12 +116,13 @@ def main():
     ap.add_argument("--w", type=int, default=256)
     ap.add_argument("--h", type=int, default=256)
     ap.add_argument("--out", default="out/temple_rt.ppm")
+    ap.add_argument('--texture', default='data/relief.ppm')
     args = ap.parse_args()
     mesh = load_obj(args.model)
-    tex = read_ppm("data/relief.ppm") if os.path.exists("data/relief.ppm") else None
+    tex = read_ppm(args.texture) if os.path.exists(args.texture) else None
     model = translate((0, 0, 0)) @ rot_y(35) @ scale((1.4, 1.4, 1.4))
     img, t = render(mesh, w=args.w, h=args.h, tex_u8=tex, model=model)
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     write_ppm(args.out, img)
     hit = np.isfinite(t)
     print(f"model: {mesh.n_tris} triangles   {args.w}x{args.h}   "

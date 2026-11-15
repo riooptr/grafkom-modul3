@@ -1,0 +1,112 @@
+
+== bug: inside-out ==
+evidence: {
+  "cause": "all face and UV corner indices reversed",
+  "fix": "reverse BOTH geometry and UV corner order once",
+  "model_matrix": [
+    [
+      1.1468128620045885,
+      0.0,
+      0.8030070108914644,
+      0.0
+    ],
+    [
+      0.0,
+      1.4,
+      0.0,
+      0.0
+    ],
+    [
+      -0.8030070108914644,
+      0.0,
+      1.1468128620045885,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "cull_back": true
+}
+SSIM(bad, reference) = 0.789685
+SSIM(fixed, reference) = 1.000000
+wrote out/bug_inside-out_bad.ppm, out/bug_inside-out_fixed.ppm, out/bug_inside-out_reference.ppm
+
+== bug: zfight ==
+evidence: {
+  "cause": "depth quantization ties with near=0.001 at far=200",
+  "fix": "near=1.0; keep far=200 and depth_bits=16",
+  "depth_bits": 16,
+  "far": 200,
+  "bad_near": 0.001,
+  "fixed_near": 1.0,
+  "wrong_pixels_before": 2852,
+  "wrong_pixels_after": 184
+}
+SSIM(bad, reference) = 0.762879
+SSIM(fixed, reference) = 0.984151
+wrote out/bug_zfight_bad.ppm, out/bug_zfight_fixed.ppm, out/bug_zfight_reference.ppm
+
+== bug: stretched ==
+evidence: {
+  "cause": "T@S@R instead of T@R@S with the same factors",
+  "fix": "swap only R and S",
+  "bad_matrix": [
+    [
+      1.392558475291286,
+      0.0,
+      0.9750799417967783,
+      0.15
+    ],
+    [
+      0.0,
+      1.1,
+      0.0,
+      0.0
+    ],
+    [
+      -0.5162187927159415,
+      0.0,
+      0.7372368398600926,
+      -0.1
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "fixed_matrix": [
+    [
+      1.392558475291286,
+      0.0,
+      0.5162187927159415,
+      0.15
+    ],
+    [
+      0.0,
+      1.1,
+      0.0,
+      0.0
+    ],
+    [
+      -0.9750799417967783,
+      0.0,
+      0.7372368398600926,
+      -0.1
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ]
+}
+SSIM(bad, reference) = 0.706605
+SSIM(fixed, reference) = 1.000000
+wrote out/bug_stretched_bad.ppm, out/bug_stretched_fixed.ppm, out/bug_stretched_reference.ppm

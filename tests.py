@@ -29,6 +29,7 @@ def t_e1_running_point():
     other = translate((1, 0, -1)) @ rot_y(90) @ p
     assert not np.allclose(other, world), "order should matter"
     assert np.allclose(other, [5, 3, -3, 1], atol=1e-9), other
+    print(f'     E1: world={world[:3]}; projection={proj}; reversed order={other[:3]}')
 
 
 def t_e2_duality():
@@ -37,6 +38,7 @@ def t_e2_duality():
     model_minus_x = translate((-1, 0, 0))                      # model moved -x
     assert np.allclose(V_cam_plus_x @ p, model_minus_x @ p, atol=1e-9), \
         (V_cam_plus_x @ p, model_minus_x @ p)
+    print(f'     E2: camera={V_cam_plus_x @ p}; model={model_minus_x @ p}')
 
 
 def t_e3_perspective_near_far():
@@ -46,6 +48,7 @@ def t_e3_perspective_near_far():
         clip = P @ np.array([0, 0, z, 1.0])
         ndc_z = clip[2] / clip[3]
         assert abs(ndc_z - want) < 1e-9, f"z={z}: ndc_z={ndc_z} want {want}"
+        print(f'     E3: eye z={z} -> NDC z={ndc_z}')
 
 
 def t_e4_perspective_correct_u():
@@ -55,6 +58,7 @@ def t_e4_perspective_correct_u():
     u_pc = u_over_w / inv_w
     assert abs(u_pc - 0.1) < 1e-12, u_pc
     assert abs(0.5 - 0.5) < 1e-12               # the naive answer, for contrast
+    print(f'     E4: naive=0.5; perspective-correct={u_pc}')
 
 
 def t_e5_barycentric_depth():
@@ -63,6 +67,7 @@ def t_e5_barycentric_depth():
     assert abs(la + lb + lc - 1) < 1e-12
     z = la * zA + lb * zB + lc * zC
     assert abs(z - 0.625) < 1e-12, z
+    print(f'     E5: barycentric NDC depth={z}')
 
 
 def t_projection_pipeline_shapes():
@@ -101,15 +106,13 @@ def t_reference_frame():
     from transforms import translate, rot_y, scale
     from metrics import psnr
     if not os.path.exists("data/pusaka_model.obj"):
-        print("     (run make_model.py first -- skipping)"); return
+        raise AssertionError('Missing input: run make_model.py first')
     mesh = load_obj("data/pusaka_model.obj")
     tex = read_ppm("data/relief.ppm")
     M = translate((0, 0, 0)) @ rot_y(35) @ scale((1.4, 1.4, 1.4))
     col, _, _ = raster3d.render(mesh, w=160, h=160, tex_u8=tex, model=M)
     if not os.path.exists("ref/temple_ref.ppm"):
-        os.makedirs("ref", exist_ok=True)
-        write_ppm("ref/temple_ref.ppm", col)
-        print("     (ref/temple_ref.ppm generated -- commit it)")
+        raise AssertionError('Missing frozen ref/temple_ref.ppm; do not silently regenerate the oracle')
     ref = read_ppm("ref/temple_ref.ppm")
     p = psnr(col, ref)
     assert p == float("inf") or p > 60, f"temple frame PSNR vs ref = {p:.1f} dB"
@@ -126,7 +129,11 @@ def main():
         ("one-triangle z-buffer render fills a plausible region, flat depth", t_one_triangle_render),
         ("temple frame matches ref/temple_ref.ppm (byte-identical on re-render)", t_reference_frame),
     ]
-    ok = all(check(n, f) for n, f in checks)
+    from tests_lab2 import CHECKS
+    checks.extend(CHECKS)
+    outcomes = [check(n, f) for n, f in checks]
+    ok = all(outcomes)
+    print(f'\n{sum(outcomes)}/{len(checks)} checks passed (no skipped inputs)')
     print("\n" + ("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED"))
     sys.exit(0 if ok else 1)
 
