@@ -1,0 +1,206 @@
+{
+  "resolution": [
+    512,
+    512
+  ],
+  "triangles": 636,
+  "matrix_max_abs_errors": {
+    "model": 0.0,
+    "view": 2.609024107869118e-15,
+    "projection": 0.0
+  },
+  "global": {
+    "psnr_db": 41.469984927317654,
+    "ssim_global": 0.9978028734027373,
+    "mean_absolute_error": 0.25472259521484375,
+    "max_absolute_error": 103
+  },
+  "surface_interior": {
+    "psnr_db": 48.062616787606245,
+    "ssim_global": 0.9997445829946467,
+    "mean_absolute_error": 0.520584583054733,
+    "max_absolute_error": 43
+  },
+  "edge_region": {
+    "psnr_db": 32.803706652474645,
+    "ssim_global": 0.9902457529066335,
+    "mean_absolute_error": 1.7359451961727905,
+    "max_absolute_error": 103
+  },
+  "interior_pixels": 10469,
+  "edge_pixels": 35326,
+  "silhouette_iou": 0.9900425810678022,
+  "browser_ui_checks": {
+    "orbit_drag_changes_camera": true,
+    "reset_restores_camera": true,
+    "wireframe_toggle_observed": true,
+    "texture_mipmap_option_observed": true,
+    "ppm_download_observed": true,
+    "metadata_download_observed": true,
+    "console_error_warning_count": 0
+  },
+  "browser": {
+    "capturedAt": "2026-11-15T09:40:29.181Z",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "threeRevision": "160",
+    "ready": true,
+    "triangles": 636,
+    "drawingBuffer": [
+      512,
+      512
+    ],
+    "pixelRatio": 1,
+    "antialias": true,
+    "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "outputColorSpace": "srgb",
+    "textureMode": "reference",
+    "wireframe": false,
+    "camera": {
+      "position": [
+        4.8,
+        3.8000000000000003,
+        6.7
+      ],
+      "target": [
+        0,
+        1.5,
+        0
+      ],
+      "fovy": 40,
+      "near": 1,
+      "far": 50
+    },
+    "modelMatrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "viewMatrix": [
+      0.8129128626387248,
+      -0.15653930590423443,
+      0.5609528709825222,
+      0,
+      4.163336342344337e-17,
+      0.9631988269995153,
+      0.26878991734579205,
+      0,
+      -0.5823853344277428,
+      -0.21850278115799404,
+      0.7829967157464378,
+      0,
+      -2.609024107869118e-15,
+      -1.4447982404992727,
+      -8.960053462131249,
+      0.9999999999999999
+    ],
+    "projectionMatrix": [
+      2.7474774194546225,
+      0,
+      0,
+      0,
+      0,
+      2.7474774194546225,
+      0,
+      0,
+      0,
+      0,
+      -1.0408163265306123,
+      -1,
+      0,
+      0,
+      -2.0408163265306123,
+      0
+    ],
+    "cpuRenderSubmissionMedianMs": 0.10000000149011612,
+    "rafIntervalMedianMs": 16.69999999999709,
+    "timingSamples": 240,
+    "lighting": {
+      "eye": [
+        4.8,
+        3.8,
+        6.7
+      ],
+      "target": [
+        0,
+        1.5,
+        0
+      ],
+      "fovy": 40,
+      "near": 1,
+      "far": 50,
+      "ambient": 0.15,
+      "light": [
+        0.4,
+        0.9,
+        0.6
+      ]
+    }
+  },
+  "benchmark": {
+    "recorded_at": "2026-11-15T16:40:26+07:00",
+    "python": "3.11.9",
+    "numpy": "2.4.6",
+    "resolution": [
+      512,
+      512
+    ],
+    "triangles": 636,
+    "samples_seconds": {
+      "raster": [
+        0.6350435999993351,
+        0.549195100000361,
+        0.5453621999986353
+      ],
+      "ray": [
+        24.873449200000323,
+        28.311161300000094,
+        37.19598120000228
+      ]
+    },
+    "median_seconds": {
+      "raster": 0.549195100000361,
+      "ray": 28.311161300000094
+    },
+    "scene": {
+      "eye": [
+        4.8,
+        3.8,
+        6.7
+      ],
+      "center": [
+        0,
+        1.5,
+        0
+      ],
+      "fovy": 40,
+      "near": 1,
+      "far": 50
+    },
+    "primary_only": true,
+    "warmup_resolution": [
+      64,
+      64
+    ],
+    "psnr_db": 68.27870805006812,
+    "ssim_global": 0.9999954378651046,
+    "different_pixels": 12,
+    "ray_to_raster_ratio": 51.55028021914523
+  },
+  "deployment": {
+    "status": "prepared_not_yet_deployed",
+    "expected_url": "https://riooptr.github.io/grafkom-modul3/"
+  }
+}

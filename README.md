@@ -1,4 +1,37 @@
-# Module 3 -- 3D Transforms, Projection, Texture & Real-Time (reference repo)
+# Module 3 -- Transformasi 3D, Texture & Real-Time
+
+## Lab 3 - viewer, pencocokan frame, dan benchmark
+
+Viewer model 636 segitiga tersedia di `web/`, lengkap dengan aset dan Three.js
+0.160.0 lokal. Jalankan `npx --yes serve@14.2.4 web` atau
+`python -m http.server 8013 --directory web`. Tidak perlu build atau CDN.
+
+- [Laporan Lab 3](lab3/Laporan_Lab3.md), [hasil analisis](lab3/results.json),
+  [prediksi sebelum benchmark](lab3/predictions_before_measurement.md).
+- Ekspor PPM asli dari browser 512x512 dibanding NumPy: **PSNR 41.470 dB**,
+  **SSIM global 0.997803**; interior permukaan **48.063 dB**.
+- M/V/P browser cocok dengan NumPy hingga selisih maksimum **2.61e-15**.
+- UI yang diuji: drag orbit, reset kamera, wireframe, mipmap, ekspor PPM dan JSON.
+- Benchmark tiga run CPU 512x512: median raster **0.5492 s**, ray **28.3112 s**,
+  rasio **51.55x**. Seluruh sampel dan rekonsiliasi prediksi ada di laporan.
+- Rendering CPU masih primary rays + Lambert; shadow sekunder/reflection belum
+  diimplementasikan dan tidak diklaim sebagai hasil terukur.
+- Tujuan publikasi: [riooptr/grafkom-modul3](https://github.com/riooptr/grafkom-modul3).
+  Status deployment aktual dicatat di `lab3/deployment.json` setelah publikasi.
+
+Reproduksi dari source lengkap:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe make_model.py
+.\.venv\Scripts\python.exe tests.py
+npx --yes serve@14.2.4 web
+```
+
+Untuk mengulang benchmark: `benchmark_lab3.py`. Untuk menganalisis ulang ekspor
+WebGL aktual yang disimpan: `analyse_lab3.py`. Script analisis tidak membuat frame
+WebGL sintetis. Bukti screenshot dan JSON browser tersedia di `lab3/`.
 
 ## Lab 2 - hasil pengerjaan lokal (15 November 2026)
 

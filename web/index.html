@@ -1,46 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pusaka3D &mdash; Module 3: Textured Temple (Three.js)</title>
-<style>
-  :root { color-scheme: light dark; }
-  body { margin: 0; font: 14px/1.5 system-ui, sans-serif; background: #12121a; color: #e8e8ef; }
-  header { padding: .6rem 1rem; background: #1c1c28; border-bottom: 1px solid #333; }
-  header h1 { font-size: 1rem; margin: 0; }
-  header p { margin: .25rem 0 0; font-size: .8rem; color: #a8a8b8; }
-  #wrap { padding: 1rem; }
-  canvas { border: 1px solid #333; display: block; }
-  button { font: inherit; padding: .3rem .7rem; margin: .6rem .4rem 0 0; }
-  .hint { font-size: .78rem; color: #999; max-width: 520px; }
-</style>
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Jelajahi blockout Gapura Bajang Ratu bertexture dalam 3D. Praktikum Grafika Komputer Modul 3.">
+<title>Pusaka3D - Gapura Bajang Ratu</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
 </head>
-<body>
-<header>
-  <h1>Pusaka3D &mdash; Textured Temple, real-time (Module 3)</h1>
-  <p>The SAME <code>data/pusaka_model.obj</code> + <code>data/relief.ppm</code> that
-     <code>raster3d.py</code> and <code>raytrace.py</code> render from scratch.
-     Three.js does the MVP stack, the w-divide, the z-buffer, and
-     perspective-correct texturing on the GPU. Drag to orbit.</p>
-</header>
-<div id="wrap">
-  <canvas id="c" width="512" height="512"></canvas>
-  <div>
-    <button id="export">Export PPM (512&times;512)</button>
-    <button id="wire">Toggle wireframe</button>
-  </div>
-  <p class="hint">Export at the <em>same</em> camera as your NumPy render, then
-     <code>python compare.py out/temple_raster.ppm web/temple_three.ppm</code> &mdash;
-     expect ~30&nbsp;dB with the residual on anti-aliased silhouette edges, not
-     in the interior (a transform bug would shift a whole region).</p>
-</div>
-<script type="module" src="viewer.js"></script>
-</body>
-</html>
+<body><main>
+<header><a class="brand" href="./"><span class="brand-mark">P3</span>Pusaka3D</a><span class="course">GRAFIKA KOMPUTER / MODUL 3</span></header>
+<section class="intro"><p class="eyebrow">WARISAN DALAM RUANG DIGITAL</p><h1>Gapura Bajang Ratu<span>.</span></h1><p class="description">Sebuah interpretasi low-poly. Putar, dekati, dan amati susunan bentuk serta permukaan batanya.</p></section>
+<section class="workspace" aria-label="Penjelajah model 3D">
+<div class="stage"><div class="stage-top"><span class="live-dot"></span><span id="status" role="status">Memuat model…</span><span class="stage-size">512 × 512</span></div><canvas id="c" width="512" height="512" aria-label="Model 3D Gapura Bajang Ratu. Seret untuk memutar, gulir untuk memperbesar."></canvas><p class="gesture">Seret untuk memutar <span>·</span> Gulir untuk mendekat <span>·</span> Klik kanan untuk menggeser</p></div>
+<aside><p class="eyebrow">AMATI MODEL</p><h2>Bentuk sederhana,<br>ruang yang bisa dijelajahi.</h2>
+<dl class="facts"><div><dt>Geometri</dt><dd>636 segitiga</dd></div><div><dt>Permukaan</dt><dd>Bata prosedural</dd></div><div><dt>Renderer</dt><dd>Three.js / WebGL</dd></div></dl>
+<div class="controls"><button id="reset" disabled>Kembali ke tampilan awal <span>↺</span></button><button id="wire" aria-pressed="false" disabled>Lihat kerangka <span>◇</span></button><label class="select-label" for="texture">Tampilan permukaan</label><select id="texture" disabled><option value="reference">Referensi NumPy</option><option value="smooth">Halus dengan mipmap</option></select><button id="export" class="primary" disabled>Unduh frame PPM <span>↓</span></button></div>
+<p class="small">Ekspor frame berukuran 512 × 512. Gunakan tampilan awal dan mode Referensi NumPy untuk membandingkan hasil renderer.</p>
+<details><summary>Detail praktikum</summary><p>Model dan texture dibuat secara prosedural dengan bantuan Codex. Ini blockout latihan, bukan rekonstruksi arkeologis terukur.</p><p>Three.js r160 · sRGB · Kamera RH · Depth aktif</p><p><a href="assets/ASSET_LICENSE.md">Lisensi aset</a> · <a href="vendor/LICENSE.three.txt">Lisensi Three.js</a></p><button id="verify" disabled>Simpan data verifikasi</button><pre id="diagnostics">Menunggu model…</pre></details>
+</aside></section><footer><span>PUSAKA3D / BAJANG RATU</span><span>Eksplorasi bentuk. Pahami pipeline.</span></footer>
+</main><script type="module" src="viewer.js"></script></body></html>

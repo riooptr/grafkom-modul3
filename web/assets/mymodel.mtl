@@ -1,0 +1,7 @@
+newmtl procedural_brick
+Ka 0.15 0.15 0.15
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd lab1_brick.png

@@ -51,7 +51,11 @@ foreach($p in @('C:\Program Files\Google\Chrome\Application\chrome.exe','C:\Prog
         from datetime import timezone, timedelta
         date = datetime.now(timezone(timedelta(hours=7))).isoformat(timespec='seconds')
     html = (ROOT/'web/index.html').read_text(encoding='utf-8')
-    three = re.search(r'three@([\d.]+)/', html).group(1)
+    match = re.search(r'three@([\d.]+)/', html)
+    if match:
+        three = match.group(1)
+    else:
+        three = json.loads((ROOT/'web/vendor/manifest.json').read_text(encoding='utf-8'))['three_version']
     return {'recorded_at':date,'timezone':'Asia/Jakarta',
             'os':f"Windows {'11' if int(win['build']) >= 22000 else '10'} {win['release']} (build {win['build']}.{win['ubr']})",
             'python':platform.python_version(),'python_executable':sys.executable,
