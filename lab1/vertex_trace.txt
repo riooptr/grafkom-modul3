@@ -1,0 +1,8 @@
+model input = data/mymodel.obj, vertex index = 1248 (zero-based)
+object p        = [0.48 1.05 0.38 1.  ]
+model  M = Ry(90) . T(1,0,-1)        ; world  = M p       = [-0.62  1.05 -1.48  1.  ]
+view   V = lookAt(eye=[0,0,8], ctr=0); eye    = V world   = [-0.62  1.05 -9.48  1.  ]   (z=-9.480: in front, dist 9.480)
+proj   P = perspective(60deg, 1.333333, 1, 50)
+clip            = P eye              = [-0.805  1.819  7.826  9.48 ]
+ndc  = clip/clip.w                   = [-0.085  0.192  0.826]
+screen (800x600) = [366 242]  depth 0.913

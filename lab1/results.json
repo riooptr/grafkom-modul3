@@ -1,0 +1,480 @@
+{
+  "toolchain": {
+    "recorded_at": "2026-11-15T15:06:57+07:00",
+    "timezone": "Asia/Jakarta",
+    "os": "Windows 11 23H2 (build 22631.6199)",
+    "python": "3.11.9",
+    "python_executable": "D:\\Semester 5\\Grafika Komputer\\Module3\\.venv\\Scripts\\python.exe",
+    "numpy": "2.4.6",
+    "pillow": "13.0.0",
+    "node": "v22.14.0",
+    "npm": "9.9.4",
+    "browsers_installed": {
+      "Microsoft Edge": "157.0.4341.60",
+      "Google Chrome": "157.0.8103.51"
+    },
+    "three_declared_in_module3": "0.160.0",
+    "browser_render_executed": false,
+    "three_reading_version": "0.160.0 (pinned upstream source)",
+    "pip_check": "No broken requirements found."
+  },
+  "model": {
+    "subject": "Stylized blockout inspired by Gapura Bajang Ratu",
+    "provenance": "Procedural geometry and texture authored with Codex assistance",
+    "not_measured_reconstruction": true,
+    "vertices": 1272,
+    "triangles": 636,
+    "uvs": 1272,
+    "components": [
+      {
+        "name": "base_0",
+        "first_triangle": 0,
+        "triangle_count": 12
+      },
+      {
+        "name": "base_1",
+        "first_triangle": 12,
+        "triangle_count": 12
+      },
+      {
+        "name": "base_2",
+        "first_triangle": 24,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_-1_0",
+        "first_triangle": 36,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_-1_1",
+        "first_triangle": 48,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_-1_2",
+        "first_triangle": 60,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_-1_3",
+        "first_triangle": 72,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_-1_4",
+        "first_triangle": 84,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_-1_5",
+        "first_triangle": 96,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_-1_0",
+        "first_triangle": 108,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_-1_1",
+        "first_triangle": 120,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_-1_2",
+        "first_triangle": 132,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_-1_3",
+        "first_triangle": 144,
+        "triangle_count": 12
+      },
+      {
+        "name": "wing_-1",
+        "first_triangle": 156,
+        "triangle_count": 12
+      },
+      {
+        "name": "wing_cap_-1",
+        "first_triangle": 168,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_1_0",
+        "first_triangle": 180,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_1_1",
+        "first_triangle": 192,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_1_2",
+        "first_triangle": 204,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_1_3",
+        "first_triangle": 216,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_1_4",
+        "first_triangle": 228,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_1_5",
+        "first_triangle": 240,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_1_0",
+        "first_triangle": 252,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_1_1",
+        "first_triangle": 264,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_1_2",
+        "first_triangle": 276,
+        "triangle_count": 12
+      },
+      {
+        "name": "jamb_moulding_1_3",
+        "first_triangle": 288,
+        "triangle_count": 12
+      },
+      {
+        "name": "wing_1",
+        "first_triangle": 300,
+        "triangle_count": 12
+      },
+      {
+        "name": "wing_cap_1",
+        "first_triangle": 312,
+        "triangle_count": 12
+      },
+      {
+        "name": "lintel",
+        "first_triangle": 324,
+        "triangle_count": 12
+      },
+      {
+        "name": "lintel_moulding",
+        "first_triangle": 336,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_tier_0",
+        "first_triangle": 348,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_lip_0",
+        "first_triangle": 360,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_tier_1",
+        "first_triangle": 372,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_lip_1",
+        "first_triangle": 384,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_tier_2",
+        "first_triangle": 396,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_lip_2",
+        "first_triangle": 408,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_tier_3",
+        "first_triangle": 420,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_lip_3",
+        "first_triangle": 432,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_tier_4",
+        "first_triangle": 444,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_lip_4",
+        "first_triangle": 456,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_tier_5",
+        "first_triangle": 468,
+        "triangle_count": 12
+      },
+      {
+        "name": "roof_lip_5",
+        "first_triangle": 480,
+        "triangle_count": 12
+      },
+      {
+        "name": "finial",
+        "first_triangle": 492,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_-1_0",
+        "first_triangle": 504,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_-1_1",
+        "first_triangle": 516,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_-1_2",
+        "first_triangle": 528,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_-1_3",
+        "first_triangle": 540,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_-1_4",
+        "first_triangle": 552,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_1_0",
+        "first_triangle": 564,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_1_1",
+        "first_triangle": 576,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_1_2",
+        "first_triangle": 588,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_1_3",
+        "first_triangle": 600,
+        "triangle_count": 12
+      },
+      {
+        "name": "stair_1_4",
+        "first_triangle": 612,
+        "triangle_count": 12
+      },
+      {
+        "name": "asymmetric_front_plaque",
+        "first_triangle": 624,
+        "triangle_count": 12
+      }
+    ],
+    "axis_convention": "right-handed; +y up; front +z",
+    "asset_license": "CC0-1.0 (new geometry and procedural texture only)"
+  },
+  "checks": {
+    "minimum_200_triangles": true,
+    "all_geometry_non_degenerate": true,
+    "all_faces_have_non_degenerate_uv": true,
+    "all_box_winding_outward": true,
+    "scalar_vs_matrix_world_view": true,
+    "project_matches_trace": true,
+    "traced_vertex_inside_frustum": true,
+    "camera_maps_to_origin": true,
+    "normal_pose_accepted": true,
+    "mirrored_negative_control_rejected": true,
+    "textured_preview_nonempty": true,
+    "pip_dependencies_consistent": true
+  },
+  "geometry_min_twice_area": 0.016,
+  "uv_min_area": 0.4608,
+  "minimum_component_signed_volume": 0.005749999999999971,
+  "vertex_index_zero_based": 1248,
+  "object": [
+    0.48,
+    1.05,
+    0.38,
+    1.0
+  ],
+  "translated": [
+    1.48,
+    1.05,
+    -0.62,
+    1.0
+  ],
+  "world": [
+    -0.6199999999999999,
+    1.05,
+    -1.48,
+    1.0
+  ],
+  "view": [
+    -0.6199999999999999,
+    1.05,
+    -9.48,
+    1.0
+  ],
+  "clip": [
+    -0.8054036255195279,
+    1.8186533479473213,
+    7.826122448979593,
+    9.48
+  ],
+  "ndc": [
+    -0.08495818834594177,
+    0.19184107045857818,
+    0.8255403427193663
+  ],
+  "screen_xy": [
+    366.01672466162324,
+    242.44767886242653
+  ],
+  "depth01": 0.9127701713596832,
+  "M": [
+    [
+      6.123233995736766e-17,
+      0.0,
+      1.0,
+      -0.9999999999999999
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      -1.0,
+      0.0,
+      6.123233995736766e-17,
+      -1.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "V": [
+    [
+      1.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      -0.0,
+      -0.0,
+      1.0,
+      -8.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "P": [
+    [
+      1.2990381056766582,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.7320508075688774,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      -1.0408163265306123,
+      -2.0408163265306123
+    ],
+    [
+      0.0,
+      0.0,
+      -1.0,
+      0.0
+    ]
+  ],
+  "depth_samples": [
+    {
+      "distance": 1,
+      "depth01": 0.0,
+      "depth24_code": 0
+    },
+    {
+      "distance": 2,
+      "depth01": 0.5102040816326531,
+      "depth24_code": 8559804
+    },
+    {
+      "distance": 5,
+      "depth01": 0.8163265306122449,
+      "depth24_code": 13695686
+    },
+    {
+      "distance": 10,
+      "depth01": 0.9183673469387755,
+      "depth24_code": 15407646
+    },
+    {
+      "distance": 25,
+      "depth01": 0.9795918367346939,
+      "depth24_code": 16434823
+    },
+    {
+      "distance": 49,
+      "depth01": 0.9995835068721366,
+      "depth24_code": 16770227
+    },
+    {
+      "distance": 50,
+      "depth01": 1.0,
+      "depth24_code": 16777215
+    }
+  ],
+  "first_meter_fraction": 0.5102040816326531,
+  "first_meter_fraction_near_001": 0.9902970693148531,
+  "depth24_step_near_far": 0.00014603138840385606,
+  "mirror_screen_xy": [
+    362.1876232150457,
+    235.962910283545
+  ],
+  "preview_visible_pixels": 89555,
+  "preview_fragment_writes": 209708
+}

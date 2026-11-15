@@ -1,0 +1,19 @@
+{
+  "recorded_at": "2026-11-15T15:06:57+07:00",
+  "timezone": "Asia/Jakarta",
+  "os": "Windows 11 23H2 (build 22631.6199)",
+  "python": "3.11.9",
+  "python_executable": "D:\\Semester 5\\Grafika Komputer\\Module3\\.venv\\Scripts\\python.exe",
+  "numpy": "2.4.6",
+  "pillow": "13.0.0",
+  "node": "v22.14.0",
+  "npm": "9.9.4",
+  "browsers_installed": {
+    "Microsoft Edge": "157.0.4341.60",
+    "Google Chrome": "157.0.8103.51"
+  },
+  "three_declared_in_module3": "0.160.0",
+  "browser_render_executed": false,
+  "three_reading_version": "0.160.0 (pinned upstream source)",
+  "pip_check": "No broken requirements found."
+}

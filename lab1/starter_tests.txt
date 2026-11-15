@@ -1,0 +1,11 @@
+OK   E1  running point (2,3,4) -> (3,3,-3); divide d=2 -> (2,2); order matters
+OK   E2  camera +x == model -x (identical points)
+OK   E3  perspective: z=-n -> ndc -1 ; z=-f -> ndc +1 ; z=-3 -> 0.5
+OK   E4  perspective-correct u at screen centre = 0.1 (naive 0.5)
+OK   E5  barycentric depth 0.20/0.50/0.90 at (.25,.25,.5) = 0.625
+OK   projection pipeline shapes + viewport
+OK   one-triangle z-buffer render fills a plausible region, flat depth
+     (ref/temple_ref.ppm generated -- commit it)
+OK   temple frame matches ref/temple_ref.ppm (byte-identical on re-render)
+
+ALL CHECKS PASSED
