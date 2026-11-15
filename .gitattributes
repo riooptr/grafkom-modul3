@@ -4,3 +4,6 @@
 *.blend -text
 *.npy -text
 *.gif -text
+*.jpg -text
+# Keep vendored upstream bytes and checksums intact across Windows checkouts.
+web/vendor/** -text -whitespace
