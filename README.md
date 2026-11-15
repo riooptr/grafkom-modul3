@@ -17,7 +17,12 @@ Viewer model 636 segitiga tersedia di `web/`, lengkap dengan aset dan Three.js
 - Rendering CPU masih primary rays + Lambert; shadow sekunder/reflection belum
   diimplementasikan dan tidak diklaim sebagai hasil terukur.
 - Tujuan publikasi: [riooptr/grafkom-modul3](https://github.com/riooptr/grafkom-modul3).
-  Status deployment aktual dicatat di `lab3/deployment.json` setelah publikasi.
+  **Viewer sudah live:** [riooptr.github.io/grafkom-modul3](https://riooptr.github.io/grafkom-modul3/).
+  Status built/HTTP 200, orbit/reset dan ekspor PPM dari URL publik terverifikasi.
+  Detail deployment ada di `lab3/deployment.json`.
+- Verified: clone baru dari GitHub, venv baru, pip install, make_model,
+  **14/14 tests**, pemeriksaan checksum vendor, dan `npx serve web` di browser.
+  Transkrip: `lab3/clean_clone_verification.txt`.
 
 Reproduksi dari source lengkap:
 

@@ -1,0 +1,70 @@
+$ git clone https://github.com/riooptr/grafkom-modul3.git .
+
+Cloning into '.'...
+
+$ D:\Semester 5\Grafika Komputer\Module3\.venv\Scripts\python.exe -m venv .venv
+
+
+$ C:\Users\Lenovo\AppData\Local\Temp\grafkom-module3-clean-0pyw2rx9\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Collecting numpy>=1.24 (from -r requirements.txt (line 6))
+  Using cached numpy-2.4.6-cp311-cp311-win_amd64.whl.metadata (6.6 kB)
+Collecting pillow>=10.0 (from -r requirements.txt (line 7))
+  Using cached pillow-13.0.0-cp311-cp311-win_amd64.whl.metadata (9.3 kB)
+Using cached numpy-2.4.6-cp311-cp311-win_amd64.whl (12.6 MB)
+Using cached pillow-13.0.0-cp311-cp311-win_amd64.whl (7.3 MB)
+Installing collected packages: pillow, numpy
+Successfully installed numpy-2.4.6 pillow-13.0.0
+
+
+[notice] A new release of pip is available: 24.0 -> 26.3
+[notice] To update, run: C:\Users\Lenovo\AppData\Local\Temp\grafkom-module3-clean-0pyw2rx9\.venv\Scripts\python.exe -m pip install --upgrade pip
+
+$ C:\Users\Lenovo\AppData\Local\Temp\grafkom-module3-clean-0pyw2rx9\.venv\Scripts\python.exe make_model.py
+wrote data/pusaka_model.obj  (120 verts, 180 triangles)
+wrote data/relief.ppm  (256x256, 196623 bytes)
+
+
+$ C:\Users\Lenovo\AppData\Local\Temp\grafkom-module3-clean-0pyw2rx9\.venv\Scripts\python.exe tests.py
+     E1: world=[ 3.  3. -3.]; projection=[2. 2.]; reversed order=[ 5.  3. -3.]
+OK   E1  running point (2,3,4) -> (3,3,-3); divide d=2 -> (2,2); order matters
+     E2: camera=[4. 0. 0. 1.]; model=[4. 0. 0. 1.]
+OK   E2  camera +x == model -x (identical points)
+     E3: eye z=-1.0 -> NDC z=-1.0
+     E3: eye z=-9.0 -> NDC z=1.0
+     E3: eye z=-3.0 -> NDC z=0.5
+OK   E3  perspective: z=-n -> ndc -1 ; z=-f -> ndc +1 ; z=-3 -> 0.5
+     E4: naive=0.5; perspective-correct=0.09999999999999999
+OK   E4  perspective-correct u at screen centre = 0.1 (naive 0.5)
+     E5: barycentric NDC depth=0.625
+OK   E5  barycentric depth 0.20/0.50/0.90 at (.25,.25,.5) = 0.625
+OK   projection pipeline shapes + viewport
+OK   one-triangle z-buffer render fills a plausible region, flat depth
+OK   temple frame matches ref/temple_ref.ppm (byte-identical on re-render)
+     near-clip: 1 outside -> 2 triangles; intersection UV=(1/3,0),(0,1/3)
+OK   Lab2 near clipping interpolates intersection attributes
+     clip/ray: 1308 visible pixels; PSNR=inf dB
+OK   Lab2 near/far visibility agrees with independent ray hits
+     mip box: linear mean=0.5 -> sRGB 188; averaging sRGB bytes would give 128
+OK   Lab2 mipmap averages linear light, not encoded sRGB
+     trilinear: LOD 0.25/0.75 -> exact 0.25/0.75 linear RGB; max LOD clamped
+OK   Lab2 trilinear blends adjacent mip levels
+     floor: perspective-correct vs ray=inf dB; naive vs ray=10.754 dB
+OK   Lab2 perspective floor agrees with ray reference, naive UV fails
+     culling: candidate fragments 8378 -> 4189; RGB unchanged
+OK   Lab2 culling reduces candidate fragments without changing image
+
+14/14 checks passed (no skipped inputs)
+
+ALL CHECKS PASSED
+
+
+$ C:\Users\Lenovo\AppData\Local\Temp\grafkom-module3-clean-0pyw2rx9\.venv\Scripts\python.exe prepare_web.py
+Prepared local assets and Three.js 0.160.0; no CDN required at runtime
+
+
+
+[Browser verification after the terminal steps]
+Command: npx --yes serve@14.2.4 web --listen 8014 --no-clipboard
+URL: http://127.0.0.1:8014/
+Observed viewer: 636 triangles ready; model rendered; no console errors/warnings.
+Verified: clean remote clone, fresh venv, pip install, make_model, 14/14 tests, vendor checksums, and browser serve.

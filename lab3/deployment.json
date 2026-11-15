@@ -1,0 +1,23 @@
+{
+  "repository": "https://github.com/riooptr/grafkom-modul3",
+  "url": "https://riooptr.github.io/grafkom-modul3/",
+  "status": "built",
+  "source": {
+    "branch": "gh-pages",
+    "path": "/"
+  },
+  "pages_commit": "e1cdedc734f9dc665ad7fc1b53a1ec299ef4932a",
+  "latest_build_status": "built",
+  "http_status": 200,
+  "deployed_three_checksum_matches": true,
+  "public_viewer_ready": true,
+  "public_orbit_reset_verified": true,
+  "public_ppm_identical_to_local": true,
+  "deployed_asset_checksums": {
+    "viewer.js": true,
+    "style.css": true,
+    "assets/mymodel.obj": true,
+    "assets/lab1_brick.png": true
+  },
+  "public_console_warnings_errors": 0
+}

@@ -5,7 +5,6 @@ must have been exported by the viewer UI. It can be rerun after deployment.
 """
 from pathlib import Path
 import json
-import hashlib
 import numpy as np
 from PIL import Image,ImageDraw
 from objio import load_obj
@@ -34,6 +33,12 @@ def main():
     assert b['textureMode']=='reference' and not b['wireframe']
     assert not np.allclose(b['camera']['position'],orbit['camera']['position'])
     assert np.allclose(b['camera']['position'],reset['camera']['position'])
+    if (OUT/'mymodel_three_public.ppm').exists():
+        assert np.array_equal(gpu,read_ppm(str(OUT/'mymodel_three_public.ppm')))
+        pub_orbit=json.loads((OUT/'browser_public_orbit.json').read_text())
+        pub_reset=json.loads((OUT/'browser_public_reference.json').read_text())
+        assert not np.allclose(pub_orbit['camera']['position'],pub_reset['camera']['position'])
+        assert np.allclose(pub_reset['camera']['position'],b['camera']['position'])
     P=perspective(40,1,1,50);V=look_at((4.8,3.8,6.7),(0,1.5,0))
     deltas={'model':float(np.max(np.abs(np.array(b['modelMatrix']).reshape(4,4,order='F')-np.eye(4)))),
             'view':float(np.max(np.abs(np.array(b['viewMatrix']).reshape(4,4,order='F')-V))),
@@ -85,6 +90,7 @@ def report(r):
     k=r['benchmark'];b=r['browser'];g=r['global'];i=r['surface_interior'];e=r['edge_region']
     samples='\n'.join(f"| {name} | "+' / '.join(f'{v:.6f}' for v in values)+f" | {k['median_seconds'][name]:.6f} |" for name,values in k['samples_seconds'].items())
     deploy=r['deployment']
+    clean=json.loads((OUT/'clean_clone.json').read_text()) if (OUT/'clean_clone.json').exists() else {}
     text=f'''# Lab 3 - Viewer WebGL, Perbandingan Renderer, dan Publikasi
 
 Model: blockout terinspirasi Gapura Bajang Ratu, **636 triangle**. Pengerjaan
@@ -207,6 +213,17 @@ Isi `web/` dipublikasikan dari branch `gh-pages` root. Source lengkap, laporan,
 model, texture, dan pengujian tetap berada pada branch utama. Token GitHub hanya
 dibaca dari Git Credential Manager ke memori proses, tidak ditulis ke repo.
 
+Deployment GitHub Pages: commit `{deploy.get('pages_commit','pending')}`,
+HTTP `{deploy.get('http_status','pending')}`. Viewer publik, orbit/reset, dan ekspor
+PPM diuji dari URL publik, dengan console tanpa error/warning. Frame publik
+identik dengan ekspor lokal: `{deploy.get('public_ppm_identical_to_local','pending')}`.
+Checksum viewer.js, CSS, OBJ, PNG dan modul Three.js yang ter-host cocok dengan
+source yang disiapkan. Bukti metadata publik tersimpan sebagai
+`browser_public_reference.json`, `browser_public_orbit.json`, dan
+`browser_public_console.json`.
+
+![Bukti viewer dari URL publik](viewer_public.jpg)
+
 ```powershell
 git clone https://github.com/riooptr/grafkom-modul3.git
 cd grafkom-modul3
@@ -224,6 +241,13 @@ Benchmark dapat diulang dengan `benchmark_lab3.py`; analisis frame aktual dengan
 `analyse_lab3.py`. Script analisis tidak mengendalikan browser dan tidak membuat
 frame WebGL palsu. Lihat `clean_clone_verification.txt` untuk transkrip clone
 bersih dan `deployment.json` untuk status deployment yang benar-benar diperoleh.
+
+Clone bersih yang diperiksa berasal dari commit `{clean.get('commit','pending')}`,
+menggunakan virtual environment baru; status pengujian
+`{clean.get('core_tests','pending')}`. Status serve/browser:
+`{clean.get('browser_serve_status','pending')}`. Clone verifikasi mendahului commit
+dokumentasi akhir; hasil berikutnya hanya menambahkan bukti dan laporan, tidak
+mengubah source viewer atau pipeline yang sudah diuji.
 
 ## 5. Refleksi pipeline (bahan dipahami sebelum viva)
 

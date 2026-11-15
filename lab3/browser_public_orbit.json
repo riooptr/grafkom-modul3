@@ -1,0 +1,110 @@
+{
+  "capturedAt": "2026-11-15T09:51:21.935Z",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "threeRevision": "160",
+  "ready": true,
+  "triangles": 636,
+  "drawingBuffer": [
+    512,
+    512
+  ],
+  "pixelRatio": 1,
+  "antialias": true,
+  "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+  "outputColorSpace": "srgb",
+  "textureMode": "reference",
+  "wireframe": false,
+  "camera": {
+    "position": [
+      -4.69127394044358,
+      3.799999999999999,
+      6.776573530606371
+    ],
+    "target": [
+      0,
+      1.5,
+      0
+    ],
+    "fovy": 40,
+    "near": 1,
+    "far": 50
+  },
+  "modelMatrix": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1
+  ],
+  "viewMatrix": [
+    0.8222035503950802,
+    0.15299349300909612,
+    -0.5482465803036081,
+    0,
+    1.3877787807814457e-17,
+    0.9631988269995155,
+    0.26878991734579205,
+    0,
+    0.5691935713952898,
+    -0.22100002435211039,
+    0.7919454952953782,
+    0,
+    0,
+    -1.4447982404992734,
+    -8.960053462131246,
+    1
+  ],
+  "projectionMatrix": [
+    2.7474774194546225,
+    0,
+    0,
+    0,
+    0,
+    2.7474774194546225,
+    0,
+    0,
+    0,
+    0,
+    -1.0408163265306123,
+    -1,
+    0,
+    0,
+    -2.0408163265306123,
+    0
+  ],
+  "cpuRenderSubmissionMedianMs": 0.09999999776482582,
+  "rafIntervalMedianMs": 16.69999999999709,
+  "timingSamples": 240,
+  "lighting": {
+    "eye": [
+      4.8,
+      3.8,
+      6.7
+    ],
+    "target": [
+      0,
+      1.5,
+      0
+    ],
+    "fovy": 40,
+    "near": 1,
+    "far": 50,
+    "ambient": 0.15,
+    "light": [
+      0.4,
+      0.9,
+      0.6
+    ]
+  }
+}

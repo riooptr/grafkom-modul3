@@ -116,10 +116,21 @@ selalu unggul.
 ## 4. Publikasi dan reproduksi
 
 Repositori tujuan pengguna: [riooptr/grafkom-modul3](https://github.com/riooptr/grafkom-modul3).
-URL viewer: [https://riooptr.github.io/grafkom-modul3/](https://riooptr.github.io/grafkom-modul3/). Status tercatat: **prepared_not_yet_deployed**.
+URL viewer: [https://riooptr.github.io/grafkom-modul3/](https://riooptr.github.io/grafkom-modul3/). Status tercatat: **built**.
 Isi `web/` dipublikasikan dari branch `gh-pages` root. Source lengkap, laporan,
 model, texture, dan pengujian tetap berada pada branch utama. Token GitHub hanya
 dibaca dari Git Credential Manager ke memori proses, tidak ditulis ke repo.
+
+Deployment GitHub Pages: commit `e1cdedc734f9dc665ad7fc1b53a1ec299ef4932a`,
+HTTP `200`. Viewer publik, orbit/reset, dan ekspor
+PPM diuji dari URL publik, dengan console tanpa error/warning. Frame publik
+identik dengan ekspor lokal: `True`.
+Checksum viewer.js, CSS, OBJ, PNG dan modul Three.js yang ter-host cocok dengan
+source yang disiapkan. Bukti metadata publik tersimpan sebagai
+`browser_public_reference.json`, `browser_public_orbit.json`, dan
+`browser_public_console.json`.
+
+![Bukti viewer dari URL publik](viewer_public.jpg)
 
 ```powershell
 git clone https://github.com/riooptr/grafkom-modul3.git
@@ -138,6 +149,13 @@ Benchmark dapat diulang dengan `benchmark_lab3.py`; analisis frame aktual dengan
 `analyse_lab3.py`. Script analisis tidak mengendalikan browser dan tidak membuat
 frame WebGL palsu. Lihat `clean_clone_verification.txt` untuk transkrip clone
 bersih dan `deployment.json` untuk status deployment yang benar-benar diperoleh.
+
+Clone bersih yang diperiksa berasal dari commit `97a7f954a3ceff2fca0433d0c8e09244eaa6e131`,
+menggunakan virtual environment baru; status pengujian
+`14/14 passed; none skipped`. Status serve/browser:
+`verified: npx serve@14.2.4 web, 636 triangles, no console errors`. Clone verifikasi mendahului commit
+dokumentasi akhir; hasil berikutnya hanya menambahkan bukti dan laporan, tidak
+mengubah source viewer atau pipeline yang sudah diuji.
 
 ## 5. Refleksi pipeline (bahan dipahami sebelum viva)
 
