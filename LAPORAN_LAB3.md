@@ -32,9 +32,9 @@ Untuk viewer interaktif saya memilih rasterisasi GPU: update kamera dan visibili
 
 ## Reproduksi dan status publikasi
 
-Workflow `.github/workflows/pages.yml` disiapkan untuk mengunggah direktori `web/` dan deploy melalui GitHub Actions setelah push ke `main`; pengaturan Pages repo harus memilih sumber GitHub Actions. URL yang diharapkan adalah `https://riooptr.github.io/grafkom-modul3/`, tetapi **belum diverifikasi sebagai halaman terbit**. Pada mesin ini SSH agent tidak memiliki identitas dan browser GitHub belum login; perubahan lokal belum dapat didorong atau konfigurasi Pages diaktifkan secara otomatis. Jangan menganggap URL ekspektasi sebagai deliverable yang sudah hidup.
+Workflow `.github/workflows/pages.yml` disiapkan untuk mengunggah direktori `web/` dan deploy melalui GitHub Actions setelah push ke `main`; pengaturan Pages repo harus memilih sumber GitHub Actions. URL yang diharapkan adalah `https://riooptr.github.io/grafkom-modul3/`, tetapi **belum diverifikasi sebagai halaman terbit**. Pada mesin ini SSH agent tidak memiliki identitas dan browser GitHub belum login; push melalui SSH gagal pada verifikasi host dan konfigurasi Pages belum dapat diaktifkan secara otomatis. Jangan menganggap URL ekspektasi sebagai deliverable yang sudah hidup.
 
-Verified lokal: `make_model.py`, `tests.py`, `benchmark.py`, renderer browser dan ekspor diperiksa pada toolchain di atas. Clone bersih, `pip install -r requirements.txt` dan `npx serve web` dalam lingkungan baru belum diverifikasi; Python yang digunakan berasal dari virtual environment lain dan viewer lokal diuji dengan `python -m http.server`. Lihat README untuk perintah lengkap.
+Verified 27 November 2026: clone bersih dari commit lokal `2b5b934` (bukan clone dari GitHub), `pip install --target <direktori-baru> -r requirements.txt` menggunakan cache paket, `make_model.py` dan 11 tes lulus; `npx --yes serve web -l 8767` menampilkan model dan orbit berfungsi di browser terintegrasi. Interpreter/pip berasal dari virtual environment yang sudah ada, sehingga ini belum menguji pembuatan environment Python baru maupun clone commit tersebut dari GitHub. Viewer awal juga diuji dengan `python -m http.server`.
 
 ## Refleksi
 

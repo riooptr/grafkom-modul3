@@ -4,6 +4,7 @@ out/
 _tmp_selftest.*
 web/temple_three.ppm
 web/*_three.ppm
+!web/mymodel_three.ppm
 
 /mymodel_three.ppm
 .agents/
