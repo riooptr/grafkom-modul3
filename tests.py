@@ -92,12 +92,11 @@ def t_one_triangle_render():
 
 
 def t_reference_frame():
-    """Render the committed temple and match ref/temple_ref.ppm (generated on
-    first run -- commit ref/ afterwards)."""
+    """Render the temple against the saved regression image."""
     import os
     import raster3d
     from objio import load_obj
-    from ppm_io import read_ppm, write_ppm
+    from ppm_io import read_ppm
     from transforms import translate, rot_y, scale
     from metrics import psnr
     if not os.path.exists("data/pusaka_model.obj"):
@@ -127,6 +126,32 @@ def t_model_winding_and_uv():
     assert normal[1] > 0, normal
 
 
+def t_near_clip():
+    from raster3d import clip_triangle_near
+    verts = np.array([[-1, 0, -2, 1], [1, 0, 0, 1], [0, 1, 0, 1]], float)
+    attrs = np.array([[0, 0], [1, 0], [0, 1]], float)
+    clipped = clip_triangle_near(verts, attrs)
+    assert len(clipped) == 2
+    for points, values in clipped:
+        assert np.all(points[:, 2] + points[:, 3] >= -1e-12)
+        assert np.all(values >= 0) and np.all(values <= 1)
+    assert any(np.isclose(p[:, 2] + p[:, 3], 0).any() for p, _ in clipped)
+
+
+def t_ray_matches_raster():
+    import raster3d, raytrace
+    from objio import load_obj
+    from ppm_io import read_ppm
+    from transforms import scale
+    from metrics import psnr
+    args = dict(w=96, h=96, tex_u8=read_ppm("data/relief.ppm"),
+                model=rot_y(35) @ scale((1.4,)*3))
+    mesh = load_obj("data/pusaka_model.obj")
+    raster, _, _ = raster3d.render(mesh, **args)
+    ray, _ = raytrace.render(mesh, **args)
+    assert psnr(raster, ray) > 60, psnr(raster, ray)
+
+
 def main():
     checks = [
         ("E1  running point (2,3,4) -> (3,3,-3); divide d=2 -> (2,2); order matters", t_e1_running_point),
@@ -136,6 +161,8 @@ def main():
         ("E5  barycentric depth 0.20/0.50/0.90 at (.25,.25,.5) = 0.625", t_e5_barycentric_depth),
         ("projection pipeline shapes + viewport", t_projection_pipeline_shapes),
         ("one-triangle z-buffer render fills a plausible region, flat depth", t_one_triangle_render),
+        ("near-plane clipping creates valid triangles", t_near_clip),
+        ("ray tracer matches rasterizer", t_ray_matches_raster),
         ("own model triangle count, UVs, and outward winding", t_model_winding_and_uv),
         ("temple frame matches ref/temple_ref.ppm (byte-identical on re-render)", t_reference_frame),
     ]

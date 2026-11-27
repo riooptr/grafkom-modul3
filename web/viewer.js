@@ -10,7 +10,7 @@ import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 const W = 512, H = 512;
 const canvas = document.getElementById("c");
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true });
 renderer.setPixelRatio(1);
 renderer.setSize(W, H, false);
 renderer.outputColorSpace = THREE.SRGBColorSpace;      // match srgb.py output encode
@@ -26,8 +26,8 @@ controls.target.set(0, 0.7, 0);
 controls.update();
 
 // --- lights: ambient 0.15 + one directional along (0.4, 0.9, 0.6) ---
-scene.add(new THREE.AmbientLight(0xffffff, 0.15));
-const sun = new THREE.DirectionalLight(0xffffff, 0.85);
+scene.add(new THREE.AmbientLight(0xffffff, 0.15 * Math.PI));
+const sun = new THREE.DirectionalLight(0xffffff, 0.85 * Math.PI);
 sun.position.set(0.4, 0.9, 0.6);
 scene.add(sun);
 
@@ -53,6 +53,8 @@ async function loadPPMTexture(url) {
   }
   const tex = new THREE.DataTexture(rgba, w, h, THREE.RGBAFormat);
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.magFilter = tex.minFilter = THREE.NearestFilter;
   tex.flipY = true;                            // OBJ vt origin is bottom-left
   tex.needsUpdate = true;
   return tex;
@@ -64,6 +66,24 @@ Promise.all([
   loadPPMTexture("./relief.ppm"),
 ]).then(([obj, tex]) => {
   const mat = new THREE.MeshLambertMaterial({ map: tex, side: THREE.DoubleSide });
+  // Match the NumPy sampler: wrap UV, map to [0, size-1], then bilinear
+  // interpolation in linear light. The DataTexture is uploaded flipped.
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.labTextureSize = { value: new THREE.Vector2(tex.image.width, tex.image.height) };
+    shader.fragmentShader = 'uniform vec2 labTextureSize;\n' + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
+      #ifdef USE_MAP
+        vec2 q = fract(vec2(vMapUv.x, 1.0 - vMapUv.y)) * (labTextureSize - 1.0);
+        vec2 lo = floor(q), hi = min(lo + 1.0, labTextureSize - 1.0), f = q - lo;
+        vec2 a = (lo + 0.5) / labTextureSize, b = (hi + 0.5) / labTextureSize;
+        vec4 c00 = texture2D(map, vec2(a.x, 1.0-a.y));
+        vec4 c10 = texture2D(map, vec2(b.x, 1.0-a.y));
+        vec4 c01 = texture2D(map, vec2(a.x, 1.0-b.y));
+        vec4 c11 = texture2D(map, vec2(b.x, 1.0-b.y));
+        diffuseColor *= mix(mix(c00, c10, f.x), mix(c01, c11, f.x), f.y);
+      #endif
+    `);
+  };
   obj.traverse((c) => { if (c.isMesh) c.material = mat; });
   obj.scale.set(1.4, 1.4, 1.4);
   obj.rotation.y = THREE.MathUtils.degToRad(35);   // rot_y(35) in transforms.py
@@ -72,7 +92,7 @@ Promise.all([
 }).catch((e) => {
   document.getElementById("wrap").insertAdjacentHTML("beforeend",
     `<p style="color:#f66">Could not load model/texture: ${e}. Serve the repo
-     root (<code>npx serve .</code>) and open <code>/web/</code>.</p>`);
+     folder (<code>npx serve web</code>).</p>`);
 });
 
 function animate() {

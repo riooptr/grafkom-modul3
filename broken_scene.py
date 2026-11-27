@@ -47,7 +47,7 @@ def bug_inside_out(mesh, tex, w=192, h=192):
                                       cull_back=True)
     fin = np.isfinite(db) & np.isfinite(dg)
     dz = float(np.mean(np.abs(db[fin] - dg[fin])))
-    return bad, good, (f"flipped winding + back-face cull: the outward faces are now "
+    return bad, good, good, db, dg, (f"flipped winding + back-face cull: the outward faces are now "
                        f"'back-facing' and culled, so the render shows the temple's "
                        f"interior surfaces instead. Visible depth differs by "
                        f"{dz:.3f} NDC on average; {fbad} vs {fgood} fragments.")
@@ -91,7 +91,7 @@ def bug_zfight(mesh, tex, w=192, h=192):
           f"reference (the two quads collapse to one depth code and draw order "
           f"decides).  near=1.0 + 16-bit depth: only {fight_good} pixels differ "
           f"-> raising `near` is the fix.")
-    return bad, good, ev
+    return bad, good, ref, db, dg, ev
 
 
 def bug_stretched(mesh, tex, w=192, h=192):
@@ -100,28 +100,31 @@ def bug_stretched(mesh, tex, w=192, h=192):
     R = rot_y(35)
     wrong_model = S @ R
     correct_model = R @ S
-    bad, _, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=wrong_model)
-    good, _, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=correct_model)
+    bad, db, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=wrong_model)
+    good, dg, _ = raster3d.render(mesh, w=w, h=h, tex_u8=tex, model=correct_model)
     ev = ("model matrix rows (bad):\n" + np.array2string(wrong_model[:3], precision=2) +
           "\nvs good:\n" + np.array2string(correct_model[:3], precision=2))
-    return bad, good, ev
+    return bad, good, good, db, dg, ev
 
 
 BUGS = {"inside-out": bug_inside_out, "zfight": bug_zfight, "stretched": bug_stretched}
 
 
 def run(name, mesh, tex):
-    bad, good, evidence = BUGS[name](mesh, tex)
+    bad, good, ref, db, dg, evidence = BUGS[name](mesh, tex)
     os.makedirs("out", exist_ok=True)
     write_ppm(f"out/bug_{name}_bad.ppm", bad)
     write_ppm(f"out/bug_{name}_fixed.ppm", good)
-    s = ssim(bad, good)
-    p = psnr(bad, good)
+    write_ppm(f"out/bug_{name}_ref.ppm", ref)
+    for label, depth in (("bad", db), ("fixed", dg)):
+        visible = np.isfinite(depth)
+        visual = np.where(visible, np.clip((depth + 1) * .5, 0, 1), 0)
+        gray = (visual * 255).astype(np.uint8)
+        write_ppm(f"out/bug_{name}_depth_{label}.ppm", np.repeat(gray[..., None], 3, axis=2))
     print(f"\n== bug: {name} ==")
     print("evidence:", evidence)
-    print(f"SSIM(bad, fixed) = {s:.3f}   PSNR = {'inf' if np.isinf(p) else f'{p:.1f}'} dB "
-          f"  -> {'large visible difference' if s < 0.9 else 'subtle'}")
-    print(f"wrote out/bug_{name}_bad.ppm, out/bug_{name}_fixed.ppm")
+    print(f"SSIM vs reference: before={ssim(bad, ref):.6f}; after={ssim(good, ref):.6f}")
+    print(f"wrote out/bug_{name}_{{bad,fixed,ref,depth_bad,depth_fixed}}.ppm")
 
 
 def main():

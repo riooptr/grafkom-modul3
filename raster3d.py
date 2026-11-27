@@ -73,7 +73,7 @@ def clip_triangle_near(vc, attrs):
 def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
            eye=(2.6, 2.0, 3.4), center=(0, 0.7, 0), fovy=45.0,
            near=1.0, far=14.0, light_dir=(0.4, 0.9, 0.6), ambient=0.15,
-           cull_back=False, depth_bits=None):
+           cull_back=False, depth_bits=None, perspective_correct=True):
     """depth_bits: if set, the stored depth is quantised to that many bits
     (a low-precision depth buffer) -- used to make z-fighting reproducible."""
     if model is None:
@@ -165,8 +165,12 @@ def render(mesh, *, w, h, tex_u8=None, model=None, tri_colors=None,
             reg[win] = frag_z[win]
 
             if tex_lin is not None:
-                u_i = (l0 * uvw[0, 0] + l1 * uvw[1, 0] + l2 * uvw[2, 0]) / inv_w_i
-                v_i = (l0 * uvw[0, 1] + l1 * uvw[1, 1] + l2 * uvw[2, 1]) / inv_w_i
+                if perspective_correct:
+                    u_i = (l0 * uvw[0, 0] + l1 * uvw[1, 0] + l2 * uvw[2, 0]) / inv_w_i
+                    v_i = (l0 * uvw[0, 1] + l1 * uvw[1, 1] + l2 * uvw[2, 1]) / inv_w_i
+                else:
+                    u_i = l0 * cattr[0, 0] + l1 * cattr[1, 0] + l2 * cattr[2, 0]
+                    v_i = l0 * cattr[0, 1] + l1 * cattr[1, 1] + l2 * cattr[2, 1]
                 tex_rgb = sample_bilinear(tex_lin, u_i, v_i)     # (H,W,3) linear
             elif tri_colors is not None:
                 tex_rgb = np.ones((*lA.shape, 3)) * srgb_to_linear(
