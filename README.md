@@ -1,5 +1,8 @@
 # Grafika Komputer — Lab 1, 2, dan 3
 
+Pemilik proyek: [riooptr](https://github.com/riooptr).
+Viewer: [Pusaka3D di GitHub Pages](https://riooptr.github.io/grafkom-modul3/).
+
 Laporan model dan transformasi ada di [LAPORAN_LAB1.md](LAPORAN_LAB1.md); pengukuran pipeline dan diagnosis ada di [LAPORAN_LAB2.md](LAPORAN_LAB2.md), dan viewer serta hasilnya di [LAPORAN_LAB3.md](LAPORAN_LAB3.md).
 
 Model [`web/mymodel.obj`](web/mymodel.obj) adalah blockout interpretatif Candi Borobudur yang dibuat secara prosedural dengan `make_model.py`: 240 segitiga dan UV untuk setiap segitiga. Tekstur [`web/relief.ppm`](web/relief.ppm) juga dihasilkan prosedural dan didedikasikan sebagai CC0-1.0. Ini bukan scan atau model Blender; aset bawaan `data/pusaka_model.obj` adalah model contoh terpisah.
